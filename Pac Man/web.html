@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pac-Man</title>
+  <style>
+    body {
+      background-color: black;
+    }
+
+    canvas {
+      width: 500px;
+      height: 500px;
+    }
+
+    .pacman {
+      fill: yellow;
+      width: 20px;
+      height: 20px;
+    }
+
+    .ghost {
+      fill: red;
+      width: 20px;
+      height: 20px;
+    }
+
+    .wall {
+      fill: black;
+      width: 10px;
+      height: 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.12.0/p5.min.js"></script>
+
+  <script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+
+    // Load the images
+    var pacmanImage = new Image();
+    pacmanImage.src = "pacman.png";
+
+    var ghostImage = new Image();
+    ghostImage.src = "ghost.png";
+
+    // Create the pacman and ghost objects
+    var pacman = {
+      image: pacmanImage,
+      x: 100,
+      y: 100,
+      speed: 5,
+    };
+
+    var ghosts = [
+      {
+        image: ghostImage,
+        x: 200,
+        y: 200,
+        speed: 3,
+      },
+      {
+        image: ghostImage,
+        x: 300,
+        y: 300,
+        speed: 3,
+      },
+      {
+        image: ghostImage,
+        x: 400,
+        y: 400,
+        speed: 3,
+      },
+    ];
+
+    // Create the maze
+    var maze = [];
+    for (let i = 0; i < 20; i++) {
+      for (let j = 0; j < 15; j++) {
+        if ((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1)) {
+          maze.push({
+            x: i * 10,
+            y: j * 10,
+          });
+        }
+      }
+    }
+
+    // Create the event loop
+    function loop() {
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Move the pacman
+      pacman.x += pacman.speed * (Math.cos(Date.now() / 1000));
+      pacman.y += pacman.speed * (Math.sin(Date.now() / 1000));
+
+      // Check for collisions
+      for (let wall of maze) {
+        if (pacman.x < wall.x + 10 && pacman.x > wall.x - 10 && pacman.y < wall.y + 10 && pacman.y > wall.y - 10) {
+          pacman.x = wall.x - 10;
+          pacman.y = wall.y - 10;
+        }
+      }
+
+      for (let ghost of ghosts) {
+        if (pacman.x < ghost.x + 10 && pacman.x > ghost.x - 10 && pacman.y < ghost.y + 10 && pacman.y > ghost.y - 10) {
+          // Game over!
+          alert("Game over!");
+          return;
+        }
+      }
+
+      // Draw the maze
+      for (let wall of maze) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(wall.x, wall.y, 10, 10);
+      }
+
